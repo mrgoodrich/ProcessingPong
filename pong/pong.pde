@@ -3,8 +3,14 @@ paddle p1, p2;
 boolean aDown,zDown,kDown,mDown;
 int startSpeedXForBall;
 int timer;
+int[] score;
 
 void setup(){
+  noStroke();
+  score = new int[2];
+  score[0] = 0;
+  score[1] = 0;
+  textSize(60);
   timer = 0;
   frameRate(1000);
   size(1080,720);
@@ -20,6 +26,12 @@ void setup(){
 }
 
 void draw(){
+  if (score[0]==5){
+    
+  }
+  else if(score[1]==5){
+  }
+  else{
   timer++;
   if(timer%300==0){
     b.increaseSpeed();
@@ -43,16 +55,24 @@ void draw(){
     if((b.getCy()>p2.getCy())&&(b.getCy()<p2.getCy()+p2.getPadHeight())){
       b.changeXDir();
       b.setCx(width-21-b.getRad()/2);
+      b.setDy((b.getCy()-p2.getCy())/(80/6)-3);
     }
   }
   if(b.getCx()<20+b.getRad()/2&&b.getCx()>b.getRad()/2){
     if((b.getCy()>p1.getCy())&&(b.getCy()<p1.getCy()+p1.getPadHeight())){
       b.changeXDir();
       b.setCx(21+b.getRad()/2);
+      b.setDy((b.getCy()-p1.getCy())/(80/6)-3);
     }
   }
+  fill(color(255,170,0));
   p1.render();
+  fill(color(0,0,255));
   p2.render();
+  fill(0);
+  text(score[0],width/4,height/4);
+  text(score[1],3*width/4,height/4);
+  }
 }
 
 class ball{
@@ -70,13 +90,30 @@ class ball{
     if (cy<rad/2||cy>height-rad/2){
       dy*=-1;
     }
+    if (cx<-10){
+      score[1]++;
+      cx = width/2;
+      cy = height/2;
+      dx = 3;
+      dy = random(-3,3);
+    }
+    if (cx > width+10){
+      score[0]++;
+      cx = width/2;
+      cy = height/2;
+      dx = -3;
+      dy = random(-3,3);
+    }
   }
   void render(){
-    fill(color(255,175,0));
+    fill(color(random(255),random(255),random(255)));
     ellipse(cx,cy,rad,rad);
   }
   void setCx(float x){
     cx = x;
+  }
+  void setDy(float y){
+    dy = y;
   }
   int getCx(){
     return (int)cx;
@@ -167,5 +204,122 @@ void keyReleased(){
   if(key == 'm'){
     mDown = false;
   }
+}
+
+
+class Particle 
+{
+   PVector loc;
+   PVector vel;
+   PVector accel;
+   float r;
+   float life;
+   color pcolor;
+  
+   // constructor
+   Particle(PVector start, color c) 
+   {
+      accel = new PVector(0, 0.05); //gravity
+      vel = new PVector(random(-2, 2), random(-5, 0), 0);
+      pcolor = c;
+      loc = start.get();  // make a COPY of the start location vector
+      r = 8.0;
+      life = random(120,140);
+   }
+    
+   // what to do each frame
+   void run() 
+   {
+      updateP();
+      renderP(); // render is a fancy word for draw.  :)
+   }
+    
+   // a function to update the particle each frame
+   void updateP() 
+   {
+      vel.add(accel); 
+      loc.add(vel);
+      pcolor = color(random(255),0,0);
+      if(random(10)>5){
+        pcolor = color(0,random(255),0);
+      }
+      if(random(10)>5){
+        pcolor = color(0,0,random(255));
+      }
+      life -= 1.0;
+   }
+   // how to draw a particle
+   void renderP() 
+   {
+      pushMatrix();
+       stroke(pcolor);
+       fill(pcolor, 70);
+       translate(loc.x, loc.y);
+       ellipse(0, 0, r, r);
+      popMatrix();
+   }
+    
+    // a function to test if a particle is alive
+   boolean alive() 
+   {
+      if (life <= 0.0) 
+      {
+         return false;
+      } 
+      else 
+      {
+         return true;
+      }
+   }
+} //end of particle object definition
+
+// now define a group of particles as a particleSys
+class PSys
+{
+  
+   ArrayList particles; // all the particles
+   PVector source; // where all the particles emit from
+   color shade; // their main color
+  
+   // constructor
+   PSys(int num, PVector init_loc) 
+   {
+      particles = new ArrayList();
+      source = init_loc.get();  // you have to do this to set a vector equal to another vector
+      shade = color(random(255), random(255), random(255));  // TODO_2 use this!
+      for (int i=0; i < num; i++) 
+      {
+         particles.add(new Particle(source, color(random(255),random(255),random(255))));
+      }
+   }
+    
+   // what to do each frame
+   void run() 
+   {
+      // go through backwards for deletes
+      for (int i=particles.size()-1; i >=0; i--) 
+      {
+         Particle p = (Particle)particles.get(i);
+          
+         // update each particle per frame
+         p.run();
+         if (!p.alive()) // what is that '!' thingy??
+         {
+            particles.remove(i);
+         }
+      }
+   }
+    
+   boolean dead() 
+   {
+      if (particles.isEmpty()) 
+      {
+         return true;
+      } 
+      else 
+      {
+         return false;
+      }
+   }
 }
 
