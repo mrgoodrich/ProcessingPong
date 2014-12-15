@@ -1,11 +1,14 @@
+PSys fireW1, fireW2;
 ball b;
 paddle p1, p2;
 boolean aDown,zDown,kDown,mDown;
 int startSpeedXForBall;
 int timer;
 int[] score;
+boolean instFire;
 
 void setup(){
+  instFire = false;
   noStroke();
   score = new int[2];
   score[0] = 0;
@@ -27,9 +30,28 @@ void setup(){
 
 void draw(){
   if (score[0]==5){
-    
+   background(255);
+   if(instFire == false){
+     fireW1 = new PSys(100, new PVector(random(20,width-20), random(height/2)));
+     instFire = true;
+   }
+   fireW1.run();
+   if(fireW1.dead()){
+     fireW1 = new PSys(100, new PVector(random(20,width-20), random(height/2)));
+   }
+   text("Player 1 wins!",width/2-200,height/2);
   }
   else if(score[1]==5){
+   background(255);
+   if(instFire == false){
+     fireW1 = new PSys(100, new PVector(random(20,width-20), random(height/2)));
+     instFire = true;
+   }
+   fireW1.run();
+   if(fireW1.dead()){
+     fireW1 = new PSys(100, new PVector(random(20,width-20), random(height/2)));
+   }
+   text("Player 2 wins!",width/2-200,height/2);
   }
   else{
   timer++;
@@ -207,6 +229,9 @@ void keyReleased(){
 }
 
 
+/**********************
+  Firework stuff below
+**********************/
 class Particle 
 {
    PVector loc;
@@ -224,7 +249,7 @@ class Particle
       pcolor = c;
       loc = start.get();  // make a COPY of the start location vector
       r = 8.0;
-      life = random(120,140);
+      life = random(200,250);
    }
     
    // what to do each frame
@@ -239,12 +264,12 @@ class Particle
    {
       vel.add(accel); 
       loc.add(vel);
-      pcolor = color(random(255),0,0);
+      pcolor = color(255,0,0);
       if(random(10)>5){
-        pcolor = color(0,random(255),0);
+        pcolor = color(0,255,0);
       }
       if(random(10)>5){
-        pcolor = color(0,0,random(255));
+        pcolor = color(0,0,255);
       }
       life -= 1.0;
    }
