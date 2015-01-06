@@ -6,7 +6,7 @@ int startSpeedXForBall;
 int timer;
 int[] score;
 boolean instFire;
-//abcdefghij
+//abcdefghijk
 
 void setup(){
   instFire = false;
